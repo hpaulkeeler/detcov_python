@@ -41,7 +41,7 @@
 import numpy as np; #NumPy package for arrays, random number generation, etc
 import matplotlib.pyplot as plt; #for plotting
 
-from funSimSimpleLDPP import funSimSimpleLDPP #simulate determintal point process
+from funSimSimpleDPP import funSimSimpleDPP #simulate determintal point process
 from funPalmK import funPalmK #find Palm distribution (for a single point)
 from funLtoK import funLtoK #convert L kernel to a (normalized) K kernel
 
@@ -128,7 +128,7 @@ L=10*L; #scale matrix up (increases the eigenvalues ie number of points)
 # END-- CREATE L matrix -- # END
 
 #Eigen decomposition
-eigenValuesL, eigenVectorsL=np.linalg.eig(L);
+eigenValL, eigenVecL=np.linalg.eig(L);
 
 #Helper functions
 def funPathloss(r):
@@ -140,14 +140,13 @@ def fun_w(r):
  return (np.exp(-(thresholdSINR/muFading)*constNoise/funPathloss(r)));
 
 #initialize  boolean vectors/arrays for collecting statistics
-
 booleA=np.zeros(numbSim, dtype=bool);  #transmitter is connected
 booleB=np.zeros(numbSim, dtype=bool); #transmitter exists
 booleC=np.zeros(numbSim, dtype=bool); #receiver exists
 #loop through all simulations
 for ss in range(numbSim):
     #DPP for active transmitter nodes
-    indexDPP=funSimSimpleLDPP(eigenVectorsL,eigenValuesL);
+    indexDPP=funSimSimpleDPP(eigenVecL,eigenValL);
     
     booleB[ss]=any(indexDPP==indexTrans); #if transmitter is in subset
     booleC[ss]=all(indexDPP!=indexRec); #if receiver is not in subset
@@ -192,19 +191,19 @@ K=funLtoK(L); #caclulate K kernel from kernel L
 sizeK=K.shape[0]; #number of columns/rows in kernel matrix K
 
 #Calculate all respective distances (based on random network configuration)
-#transmitters to other receivers
-dist_ji_xx=np.outer(xx, np.ones((sizeL,)))-np.outer( np.ones((sizeL,)),xxRX);
-dist_ji_yy=np.outer(yy, np.ones((sizeL,)))-np.outer( np.ones((sizeL,)),yyRX)
+#from all transmitters to receiver
+dist_ji_xx=np.outer(xx, np.ones((sizeK,)))-np.outer( np.ones((sizeK,)),xxRX);
+dist_ji_yy=np.outer(yy, np.ones((sizeK,)))-np.outer( np.ones((sizeK,)),yyRX)
 dist_ji=np.hypot(dist_ji_xx,dist_ji_yy); #Euclidean distances
 #transmitters to receivers
 dist_ii_xx=xxTX-xxRX;
 dist_ii_yy=yyTX-yyRX;
 dist_ii=np.hypot(dist_ii_xx,dist_ii_yy); #Euclidean distances
-dist_ii=np.tile(dist_ii,(sizeL,1));#repeat cols for element-wise evaluation
+dist_ii=np.tile(dist_ii,(sizeK,1));#repeat cols for element-wise evaluation
 
 #apply functions
 hMatrix=fun_h(dist_ji,dist_ii); #matrix H for all h_{x_i}(x_j) values
-W_x=fun_w(np.hypot(xx-xxRX,yy- yyRX)); #noise factor
+W_x=fun_w(np.hypot(xx-xxRX,yy-yyRX)); #noise factor
 
 ##create h matrix corresponding to transmitter
 booleAll=np.ones(sizeK,dtype=bool); 
@@ -313,8 +312,8 @@ print('probCov_Emp1 = ',probCov_Emp1)
 ###END Connection Proability (ie SINR>thresholdConst) END###
 
 #TEST
-#[probCov,probTXRX,probCovCond]=funProbCovTXRXDet(xx,yy,...
-#   fun_h,fun_w,L,indexTrans,indexRec)
+from funProbCovTXRXDet import funProbCovTXRXDet
+probCov,probTXRX,probCovCond=funProbCovTXRXDet(xx,yy,fun_h,fun_w,L,indexTrans,indexRec)
 
 if indexDPP.size>0:
     ### START -- Plotting -- START ###

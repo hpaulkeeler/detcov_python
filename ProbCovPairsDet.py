@@ -31,7 +31,7 @@
 
 import numpy as np; #NumPy package for arrays, random number generation, etc
 
-from funSimSimpleLDPP import funSimSimpleLDPP #simulate determintal point process
+from funSimSimpleDPP import funSimSimpleDPP #simulate determintal point process
 from funPalmK import funPalmK #find Palm distribution (for a single point)
 from funLtoK import funLtoK #convert L kernel to a (normalized) K kernel
 
@@ -139,7 +139,7 @@ booleTX=np.zeros(numbSim, dtype=bool); #transmitter-receiver pair exists
 booleCov=np.zeros(numbSim, dtype=bool); #transmitter-receiver pair is connected
 #loop through all simulations
 for ss in range(numbSim):
-    indexDPP=funSimSimpleLDPP(eigenVectorsL,eigenValuesL);
+    indexDPP=funSimSimpleDPP(eigenVectorsL,eigenValuesL);
     #if transmitter-receiver pair exists in determinantal outcome
     booleTX[ss]=any(indexDPP==indexTransPair);
 
@@ -168,6 +168,7 @@ for ss in range(numbSim):
 
         #Calculate the SINR
         SINR=proplossSig/(np.sum(proplossInter)+constNoise);
+		
         #see if transmitter is connected
         booleCov[ss]=(SINR>thresholdSINR);
 

@@ -1,4 +1,4 @@
-# funSimSimpleLDPP(eigenVectL,eigenValL), returns indexConfig
+# funSimSimpleDPP(eigenVectL,eigenValL), returns indexConfig
 # This function simulates a determinantal point process (DPP) provided a
 # L matrix. It was used to produce the results in the paper by Blaszczyszyn 
 # and Keeler[1].
@@ -32,7 +32,7 @@
 import numpy as np
 from scipy.linalg import orth
 
-def funSimSimpleLDPP(eigenVectL,eigenValL):
+def funSimSimpleDPP(eigenVectL,eigenValL):
     
     #START - Sampling/simulating DPP - START
     # START Simulating/sampling DPP
