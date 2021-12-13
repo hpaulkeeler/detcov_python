@@ -5,8 +5,8 @@
 # in the paper by Shirai and Takahashi[3]; see Theorem 6.5 and
 # Corolloary 6.6 in [3].
 #
-# This method appears more numerically stable than using the Palm results 
-# for the L matrix method derived by Borodin and Rains[2]. 
+# This method appears more numerically stable than using the Palm results
+# for the L matrix method derived by Borodin and Rains[2].
 #
 # INPUTS:
 # K = A square K(-matrix-)kernel, which must be (semi-)positive-definite.
@@ -32,7 +32,7 @@
 # [3] Shirai and Takahashi, "Random point fields associated with certain
 # Fredholm determinants I -- fermion, poisson and boson point", 2003.
 
-import numpy as np #NumPy package for arrays, random number generation, etc
+import numpy as np  # NumPy package for arrays, random number generation, etc
 
 #####TEMP: Testing
 #B=np.array([[9, 2, 1], [3, 8,2], [3, 1,7]]);
@@ -45,67 +45,65 @@ import numpy as np #NumPy package for arrays, random number generation, etc
 #indexPalm=[0,1] #indexing starts at zero
 #indexPalm=np.asarray(indexPalm); # convert to a Numpy array
 
-def funPalmK(K,indexPalm):   
-    indexPalm=np.asarray(indexPalm); # convert to a Numpy array 
-    
-    #function creates reduced version of the Palm kernel                   
-    def funPalmReducedK(K,indexPalm):           
-        
-        sizeK=K.shape[0]; #number of rows/columns of K matrix
-            
-        if np.max(indexPalm)>sizeK:
-            raise SystemExit('The index is too large.');
-                
-        #create Boolean array of remaining points/locations    
-        booleRemain=np.ones(sizeK,dtype=bool);
-        booleRemain[indexPalm]=False; 
-                   
-        if indexPalm.size==1:                
+
+def funPalmK(K, indexPalm):
+    indexPalm = np.asarray(indexPalm)  # convert to a Numpy array
+
+    #function creates reduced version of the Palm kernel
+    def funPalmReducedK(K, indexPalm):
+
+        sizeK = K.shape[0]  # number of rows/columns of K matrix
+
+        if np.max(indexPalm) > sizeK:
+            raise SystemExit('The index is too large.')
+
+        #create Boolean array of remaining points/locations
+        booleRemain = np.ones(sizeK, dtype=bool)
+        booleRemain[indexPalm] = False
+
+        if indexPalm.size == 1:
             #create Boolean array for Palm points
-            boolePalm=~booleRemain;
-    
+            boolePalm = ~booleRemain
+
             #create kernel for reduced Palm distribution
-            KPalmReduced=K[:,booleRemain][booleRemain,:]\
-            -K[:,boolePalm][booleRemain,:]\
-            *K[:,booleRemain][boolePalm,:]/K[boolePalm,boolePalm];
-            
-        elif indexPalm.size>1:
-            indexPalm=np.sort(indexPalm); #make sure index is sorted
-            
+            KPalmReduced = K[:, booleRemain][booleRemain, :]\
+                - K[:, boolePalm][booleRemain, :]\
+                * K[:, booleRemain][boolePalm, :]/K[boolePalm, boolePalm]
+
+        elif indexPalm.size > 1:
+            indexPalm = np.sort(indexPalm)  # make sure index is sorted
+
             #call function funPalmReducedK recursively until a single point remains
-            KTemp=funPalmReducedK(K,indexPalm[0]); #past the first element
-            
-            #decrease remaining indices by one  
-            indexPalmTemp=indexPalm[1:]-1;     
-            
-            KPalmReduced=funPalmReducedK(KTemp,indexPalmTemp);              
+            KTemp = funPalmReducedK(K, indexPalm[0])  # past the first element
+
+            #decrease remaining indices by one
+            indexPalmTemp = indexPalm[1:]-1
+
+            KPalmReduced = funPalmReducedK(KTemp, indexPalmTemp)
         else:
-            raise SystemExit('The Palm index is not a valid value.')  
-        return KPalmReduced  
-    
-    #create non-reduced version of Palm kernel            
-    def funPalmNonreducedK(K,indexPalm,KPalmReduced):           
-        sizeK=K.shape[0]; #number of rows/columns of K matrix    
-        booleRemain=np.ones(sizeK,dtype=bool);
-        booleRemain[indexPalm]=False; 
+            raise SystemExit('The Palm index is not a valid value.')
+        return KPalmReduced
+
+    #create non-reduced version of Palm kernel
+    def funPalmNonreducedK(K, indexPalm, KPalmReduced):
+        sizeK = K.shape[0]  # number of rows/columns of K matrix
+        booleRemain = np.ones(sizeK, dtype=bool)
+        booleRemain[indexPalm] = False
         #create indices
-        indexRemain=np.arange(sizeK)[booleRemain];
-        
-        #create (non-reduced) Palm kernel    
-        KPalm=np.eye(sizeK);
+        indexRemain = np.arange(sizeK)[booleRemain]
+
+        #create (non-reduced) Palm kernel
+        KPalm = np.eye(sizeK)
         for i in range(KPalmReduced.shape[0]):
-            KPalm[booleRemain, indexRemain[i]] = KPalmReduced[:, i];
-            
-        return KPalm;
-    
-    KPalmReduced=funPalmReducedK(K,indexPalm); #reduced Palm kernel
-    KPalm=funPalmNonreducedK(K,indexPalm,KPalmReduced);#non-reduced Palm kernel
-    
+            KPalm[booleRemain, indexRemain[i]] = KPalmReduced[:, i]
+
+        return KPalm
+
+    KPalmReduced = funPalmReducedK(K, indexPalm)  # reduced Palm kernel
+    # non-reduced Palm kernel
+    KPalm = funPalmNonreducedK(K, indexPalm, KPalmReduced)
+
     return KPalmReduced, KPalm
 
 #KPalmReduced, KPalm=funPalmK(K,indexPalm)
 #print(KPalmReduced)
-    
-
-    
-    

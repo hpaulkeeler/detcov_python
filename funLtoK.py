@@ -1,8 +1,8 @@
 # K=funLtoK(L)
-# The function funLtoK(L) converts a kernel L matrix into  a (normalized) 
+# The function funLtoK(L) converts a kernel L matrix into  a (normalized)
 # kernel K matrix. The K matrix has to be semi-positive definite.
 
-import numpy as np #NumPy package for arrays, random number generation, etc
+import numpy as np  # NumPy package for arrays, random number generation, etc
 
 ##TEMP: Testing
 #B=np.array([[3, 2, 1], [4, 5,6], [9, 8,7]]);
@@ -11,16 +11,18 @@ import numpy as np #NumPy package for arrays, random number generation, etc
 #
 #
 
+
 def funLtoK(L):
     #METHOD 1 -- using eigen decomposition.
-    #This method doesn't need inverse calculating and seems to more stable.    
-    eigenValL,eigenVectLK=np.linalg.eig(L); #eigen decomposition    
-    eigenValK=eigenValL/(1+eigenValL); #eigenvalues of K
-    eigenValK=np.diagflat(eigenValK); ##eigenvalues of L as diagonal matrix
-    K=np.matmul(np.matmul(eigenVectLK,eigenValK),eigenVectLK.transpose()); #recombine from eigen components    
-    K=np.real(K); #make sure all values are real        
+    #This method doesn't need inverse calculating and seems to more stable.
+    eigenValL, eigenVectLK = np.linalg.eig(L)  # eigen decomposition
+    eigenValK = eigenValL/(1+eigenValL)  # eigenvalues of K
+    eigenValK = np.diagflat(eigenValK)  # eigenvalues of L as diagonal matrix
+    # recombine from eigen components
+    K = np.matmul(np.matmul(eigenVectLK, eigenValK), eigenVectLK.transpose())
+    K = np.real(K)  # make sure all values are real
     return K
-    
+
 
 #K=funLtoK(L)
 # K=
